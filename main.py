@@ -42,7 +42,6 @@ def automate_devices(method):
     if option == '1':
         #print separator
         utils.print_separator()
-        print("\nYou selected to automate one device.")
         
         if method == 'Asynchronous':
             print(f'Executing {method} process for one device...')
@@ -50,7 +49,11 @@ def automate_devices(method):
         
         elif method == 'Multithreading':
             print(f'Executing {method} process for one device...')
-            # Add logic for automating one device using Multithreading here
+            
+            # Get the router info from the user
+            router_info = utils.get_router_info()
+            print(router_info)
+            
         
 
 
@@ -58,7 +61,6 @@ def automate_devices(method):
     elif option == '2':
         #print separator
         utils.print_separator()
-        print("\nYou selected to automate multiple devices.")
         
         if method == 'Asynchronous':
             print(f'Executing {method} process for mutiple devices...')

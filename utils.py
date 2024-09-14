@@ -43,3 +43,13 @@ def print_separator(char='-'):
     # Print the separator
     print(separator)
 
+
+# One router request info (Paramiko)
+def get_router_info():
+    router = {
+        'hostname': input("Enter the router's hostname or IP address: "),
+        'port': input("Enter the port number (default is 22): ") or '22',  # Default to port 22 if no input
+        'username': input("Enter the username: "),
+        'password': input("Enter the password: ")
+    }
+    return router
