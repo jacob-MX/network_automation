@@ -22,13 +22,7 @@ def get_user_input(prompt):
  # Clear terminal
 def clear_terminal(): 
     
-    os.system('clear') 
-
-
-# Exit the program
-def handle_exit(): 
-    print("\nThanks for using NETWORK AUTOMATION, bye!")
-    sys.exit()         
+    os.system('clear')       
 
 
 #Print a separator based on the terminal width.
@@ -42,6 +36,12 @@ def print_separator(char='-'):
     
     # Print the separator
     print(separator)
+
+
+# Exit the program
+def handle_exit(): 
+    print("\nThanks for using NETWORK AUTOMATION, bye!")
+    sys.exit()   
 
 
 # One router request info (Paramiko)
