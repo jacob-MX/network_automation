@@ -14,11 +14,6 @@ def print_menu(title, options):
         print(f'{idx}) {option}')
     print('\n')
 
-# Gets and returns user input
-def get_user_input(prompt):
-    
-    return input(prompt)
-
 
  # Clear terminal
 def clear_terminal(): 
@@ -45,10 +40,18 @@ def handle_exit():
     sys.exit()   
 
 
+# Gets and returns user input
+def get_user_input(prompt):
+    try:
+        return input(prompt)
+    except KeyboardInterrupt:
+        handle_exit()
+        
+
 # One router request info (Paramiko)
 def get_router_info():
     router = {
-        'hostname': input("Enter the router's hostname or IP address: "),
+        'hostname': input("Enter the router's IP address: "),
         'port': input("Enter the port number (default is 22): ") or '22',  # Default to port 22 if no input
         'username': input("Enter the username: "),
         'password': input("Enter the password: ")
@@ -89,3 +92,26 @@ def store_routers_in_json(filename="devices.json"):
         json.dump(routers, file, indent=4)
 
     print(f"\nAll router information has been saved to {filename}")
+
+
+# Find JSON file in current direcotry
+def find_json_file():
+    while True:
+        try:
+            # Get the filename from the user
+            filename = get_user_input('Please enter the file name (with .json extension): ')
+
+            # Check in the current directory
+            current_dir = os.getcwd()
+            filepath = os.path.join(current_dir, filename)
+
+            if os.path.exists(filepath) and filepath.endswith('.json'):
+                print(f"File found in the current directory: {filepath}")
+                print_separator()
+                return filename
+            else:
+                print("File not found in the current directory or it's not a JSON file.")
+                print_separator()
+        
+        except KeyboardInterrupt:
+            handle_exit()

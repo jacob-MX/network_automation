@@ -18,7 +18,7 @@ print('''
                                                                           
            
                                                           
-                                                        -Made by Angel Jacobo Madrigal''')
+                                           -Made by Angel Jacobo Madrigal''')
 def second_menu():
     # Define methods
     options = ["JSON file", "Manual insertion", "EXIT"]
@@ -70,7 +70,8 @@ def main_menu():
             #print separator
             utils.print_separator()
             print('You have selected "JSON" format')
-            input('Please enter file name: ')
+            filename = utils.find_json_file()
+            
 
         if user_choice == '2':
             #print separator
@@ -93,7 +94,8 @@ def main_menu():
             #print separator
             utils.print_separator()
             print('You have selected "JSON" format')
-            input('Please enter file name: ')
+            filename = utils.find_json_file()
+
 
         if user_choice == '2':
             #print separator
