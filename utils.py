@@ -3,6 +3,7 @@
 # Utilitiy functions, helpers, etc...
 import os
 import sys
+import json
 
 # Prints a menu with a title and list of options
 def print_menu(title, options):
@@ -53,3 +54,38 @@ def get_router_info():
         'password': input("Enter the password: ")
     }
     return router
+
+
+# Two options Menu
+def yes_or_no(title):
+    # Ask user if they want to add another device
+    add_more = input(title).strip().lower()
+    if add_more == 'yes' or add_more == 'no' :
+        return add_more
+    else:
+        print('Please select a correct answer: "yes" or "no"')
+        return yes_or_no(title)
+
+
+# Function to store routers in JSON format
+def store_routers_in_json(filename="devices.json"):
+    routers = []
+
+    while True:
+        # Get router info from user
+        router = get_router_info()
+        routers.append(router)
+
+        # "yes or no" user's choice 
+        title = "Do you want to store another device? (yes/no): "
+        user_choice = yes_or_no(title)
+        if user_choice == 'yes':
+            pass
+        if user_choice == 'no':
+            break
+            
+    # Save the routers list to a JSON file
+    with open(filename, 'w') as file:
+        json.dump(routers, file, indent=4)
+
+    print(f"\nAll router information has been saved to {filename}")

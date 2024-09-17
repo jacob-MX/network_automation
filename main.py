@@ -27,36 +27,16 @@ def second_menu():
     # Get user's choice for method
     option = utils.get_user_input('Please select an option: ')
 
+    if option == '1' or option == '2' or option == '3': 
+        pass
 
-    if option == '1':
-                
-                #print separator
-                utils.print_separator()
-                print('You have selected "JSON" method')
-
-    elif option == '2':
-                
-                #print separator
-                utils.print_separator()
-                print('You have selected "Manual insertion" method')
+    else:        
+        # print separator
+        utils.print_separator()
+        print("\nInvalid option. Please select either 1, 2, or 3.")
+        return second_menu()
         
-
-    elif option == '3':
-                
-                # print separator
-                utils.print_separator()
-                # Handle exit (utils.py)
-                utils.handle_exit()
-                # print separator
-                utils.print_separator()
-
-    else:
-        
-                # print separator
-                utils.print_separator()
-                print("\nInvalid option. Please select either 1, 2, or 3.")
-                second_menu()
-
+    return option
     
 
         
@@ -75,27 +55,54 @@ def main_menu():
     # Get user's choice for method
     option = utils.get_user_input('Please select an option: ')
     print()
-    
+
+
+    # Main menu "ASYNCHRONOUS" 
     if option == '1':
 
         #print separator
         utils.print_separator()
         print('You have selected "Asynchronous" method')
         # Invoke second menu and store the user's choice
-        second_menu()
+        user_choice = second_menu()
+        
+        if user_choice == '1':
+            #print separator
+            utils.print_separator()
+            print('You have selected "JSON" format')
+            input('Please enter file name: ')
+
+        if user_choice == '2':
+            #print separator
+            utils.print_separator()
+            print('You have selected "Manual Insertion"')
+            utils.store_routers_in_json()
+        
 
         
-        
+    # Main menu "Multithreading"    
     elif option == '2':
 
         # print separator
         utils.print_separator()
         print('You have selected "Multithreading" method')
         # Invoke second menu and store the user's choice
-        second_menu()
+        user_choice = second_menu()
         
-        
-        
+        if user_choice == '1':
+            #print separator
+            utils.print_separator()
+            print('You have selected "JSON" format')
+            input('Please enter file name: ')
+
+        if user_choice == '2':
+            #print separator
+            utils.print_separator()
+            print('You have selected "Manual Insertion"')
+            utils.store_routers_in_json()
+
+    
+    # Main menu "EXIT"
     elif option == '3':
         
         # print separator
@@ -105,7 +112,8 @@ def main_menu():
         # print separator
         utils.print_separator()
 
-    
+
+    # Main menu invalid option
     else:
         
         # print separator
