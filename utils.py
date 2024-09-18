@@ -91,7 +91,7 @@ def store_routers_in_json(filename="devices.json"):
     with open(filename, 'w') as file:
         json.dump(routers, file, indent=4)
 
-    print(f"\nAll router information has been saved to {filename}")
+    print(f"All router information has been saved to {filename}")
 
 
 # Find JSON file in current direcotry
@@ -115,3 +115,17 @@ def find_json_file():
         
         except KeyboardInterrupt:
             handle_exit()
+
+
+
+# Read devices.json from the current directory
+def read_devices_file(filename='devices.json'):
+    try:
+        with open(filename, 'r') as file:
+            devices = json.load(file)  # Parse the JSON file into a Python object
+        return devices
+    except FileNotFoundError:
+        print("Error: The file 'devices.json' was not found.")
+    except json.JSONDecodeError:
+        print("Error: The file 'devices.json' contains invalid JSON.")
+    return None
