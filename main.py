@@ -27,6 +27,7 @@ def second_menu():
     # Get user's choice for method
     option = utils.get_user_input('Please select an option: ')
 
+    # Making sure every option is a valid one
     if option == '1' or option == '2' or option == '3': 
         pass
 
@@ -34,6 +35,7 @@ def second_menu():
         # print separator
         utils.print_separator()
         print("\nInvalid option. Please select either 1, 2, or 3.")
+        # Recursive function in case of multiple invalid options
         return second_menu()
         
     return option
@@ -70,14 +72,20 @@ def main_menu():
             #print separator
             utils.print_separator()
             print('You have selected "JSON" format')
+            # save filename given by the user and checks for its existence in the current directory
             filename = utils.find_json_file()
+            utils.multiple_connection(filename)
+            
             
 
         if user_choice == '2':
             #print separator
             utils.print_separator()
             print('You have selected "Manual Insertion"')
+            # Store devices given by the user
             utils.store_routers_in_json()
+            
+            
         
 
         
@@ -102,6 +110,15 @@ def main_menu():
             utils.print_separator()
             print('You have selected "Manual Insertion"')
             utils.store_routers_in_json()
+            #print separator
+            utils.print_separator()
+            
+            # Store JSON file as Python objects
+            devices = utils.read_devices_file()
+            # Checks for existence of variable
+            if devices:
+                # Iterate over each device given by the user 
+                ssh_manager.multiple_connection(devices)
 
     
     # Main menu "EXIT"
@@ -121,6 +138,7 @@ def main_menu():
         # print separator
         utils.print_separator()
         print("\nInvalid option. Please select either 1, 2, or 3.")
+        # Recursive function in case of multiple invalid options
         main_menu()
 
 
