@@ -3,8 +3,10 @@
 # Testing backbone application
 
 # import utility functions
-import utils
 import ssh_manager
+import utils
+import asyncio
+
 
 utils.clear_terminal()
 
@@ -74,7 +76,7 @@ def main_menu():
             print('You have selected "JSON" format')
             # save filename given by the user and checks for its existence in the current directory
             filename = utils.find_json_file()
-            utils.multiple_connection(filename)
+           
             
             
 
@@ -82,9 +84,20 @@ def main_menu():
             #print separator
             utils.print_separator()
             print('You have selected "Manual Insertion"')
-            # Store devices given by the user
+
             utils.store_routers_in_json()
-            
+            # Store JSON file as Python objects
+            devices = utils.read_devices_file()
+            # Checks for existence of variable
+            if devices:
+                # Specify the commands to run on each device
+                commands = ['ls', 'id -un']
+                
+                # run_multiple_clients is an async function, we need to run it inside an event loop
+                ssh_objects = asyncio.run(ssh_manager.run_multiple_clients(devices, commands))
+                # print output per device
+                utils.print_objects(ssh_objects, devices)
+                
             
         
 
@@ -115,10 +128,8 @@ def main_menu():
             
             # Store JSON file as Python objects
             devices = utils.read_devices_file()
-            # Checks for existence of variable
-            if devices:
-                # Iterate over each device given by the user 
-                ssh_manager.multiple_connection(devices)
+
+                
 
     
     # Main menu "EXIT"

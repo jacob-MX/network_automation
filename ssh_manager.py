@@ -1,72 +1,47 @@
 import paramiko
+import asyncio
+import asyncssh
 
-def get_device_info(ssh_client, ip_address):
-    # Linux command
-    stdin, stdout, stderr = ssh_client.exec_command('uname -a')
-    linux_output = stdout.read().decode().lower()
+
+
+# Define the main coroutine to connect to the SSH server and run the commands
+async def connect_and_run(host, username, password, commands):
     
-    # If it's a Linux machine
-    if 'linux' in linux_output:
-        print(f"{ip_address} is a Linux machine.")
-        return
+    # Initialize a list to store the result objects (output of each command)
+    objects = []
 
-    # Windows check - try running a Windows-specific command
-    stdin, stdout, stderr = ssh_client.exec_command('cmd.exe /c ver')
-    windows_output = stdout.read().decode().lower()
+    # Asynchronously ensure that the SSH connection is opened, used,
+    # and properly closed when the operation is complete.
+    async with asyncssh.connect(host=host, username=username, password=password, known_hosts=None) as connection:
+        
+        # Loop through the commands and run each command on the same connection
+        for command in commands:
+            try:
+                # Asynchronously send the command and retrieve the result object
+                obj = await connection.run(command)
+                # Append the result object to the list
+                objects.append(obj)
+            except Exception as e:
+                # Handle the case where the command fails
+                print(f"Command '{command}' failed with error: {e}")
 
-    if 'microsoft' in windows_output or 'windows' in windows_output:
-        print(f"{ip_address} is a Windows machine.")
-        return
-
-    # Cisco command to check for Cisco devices
-    stdin, stdout, stderr = ssh_client.exec_command('show version')
-    cisco_output = stdout.read().decode().lower()
-
-    if 'cisco' in cisco_output:
-        print(f"{ip_address} is a Cisco device.")
-        return
-
-
-    # If none of the above commands match
-    print("Could not determine the device type.")
+    return objects
 
 
-
-def connect_to_router(router):
-    ssh_client = paramiko.SSHClient()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Trust the server automatically
-
-    print(f'Connecting to {router["hostname"]}...')
+# Modify run_multiple_clients to accept both hosts and commands
+async def run_multiple_clients(hosts, commands):
     
-    try:
-        ssh_client.connect(
-            hostname=router['hostname'], 
-            port=int(router['port']),  # Convert port to integer
-            username=router['username'], 
-            password=router['password'],
-            look_for_keys=False, 
-            allow_agent=False
-        )
-        print(f"\nSuccessfully connected to {router['hostname']}!")
-        
-        # After successful connection, get device information
-        get_device_info(ssh_client, router['hostname'])
-        
-    except paramiko.AuthenticationException:
-        print(f"\nAuthentication failed when connecting to {router['hostname']}.")
-    except paramiko.SSHException as sshException:
-        print(f"\nSSH error occurred while connecting to {router['hostname']}: {sshException}")
-    except paramiko.BadHostKeyException as badHostKeyException:
-        print(f"\nInvalid host key for {router['hostname']}: {badHostKeyException}")
-    except Exception as e:
-        print(f"\nFailed to connect to {router['hostname']}: {e}")
-    finally:
-        ssh_client.close()
+    # Initialize a list to store the tasks (one per host)
+    tasks = list()
+    
+    # Iterate over each host in the hosts list
+    for host in hosts:
+        # Create a task for each host to run the SSH commands using connect_and_run()
+        task = connect_and_run(host['hostname'], host['username'], host['password'], commands)
+        # Append each task to the tasks list
+        tasks.append(task)
 
-
-
-
-def multiple_connection(json):
-    for device in json:
-        connect_to_router(device)
-
+    # Run all the tasks asynchronously in parallel and collect the results
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    return results

@@ -63,10 +63,10 @@ def get_router_info():
 def yes_or_no(title):
     # Ask user if they want to add another device
     add_more = input(title).strip().lower()
-    if add_more == 'yes' or add_more == 'no' :
+    if add_more == 'y' or add_more == 'n' :
         return add_more
     else:
-        print('Please select a correct answer: "yes" or "no"')
+        print('Please select a correct answer: "y" or "n"')
         return yes_or_no(title)
 
 
@@ -80,11 +80,11 @@ def store_routers_in_json(filename="devices.json"):
         routers.append(router)
 
         # "yes or no" user's choice 
-        title = "Do you want to store another device? (yes/no): "
+        title = "Do you want to store another device? (y/n): "
         user_choice = yes_or_no(title)
-        if user_choice == 'yes':
+        if user_choice == 'y':
             pass
-        if user_choice == 'no':
+        if user_choice == 'n':
             break
             
     # Save the routers list to a JSON file
@@ -129,3 +129,24 @@ def read_devices_file(filename='devices.json'):
     except json.JSONDecodeError:
         print("Error: The file 'devices.json' contains invalid JSON.")
     return None
+
+
+
+# Pretty printing SSHCompletedProcess object
+def print_objects(objects, hosts):
+
+    # Process and print the results from each host
+    i = 0
+    for obj in objects:
+        print(f"Results from host {hosts[i]['hostname']}:")
+        for command in obj:
+            print(f"Command executed: {command.command}")
+            print(f"Exit status: {command.exit_status}")
+            print(f"Standard Output:\n{command.stdout}")
+            print(f"Standard Error (if any): {command.stderr}")
+            print('#' * 50)
+        i += 1
+
+
+
+
