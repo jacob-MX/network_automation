@@ -128,9 +128,115 @@ def read_devices_file(filename='devices.json'):
         print("Error: The file 'devices.json' was not found.")
     except json.JSONDecodeError:
         print("Error: The file 'devices.json' contains invalid JSON.")
+        
     return None
 
 
+# get commands by the user and returns a list
+def get_async_commands():
+    commands = list()
+
+    # Initializing loop
+    while True: 
+        # append command to the list
+        commands.append(input("Please enter command: "))
+        # invoke yes or no menu function
+        choice = yes_or_no("Another command will be appended (y/n)?")
+        # If choice yes, continues iteration
+        if choice == 'y':
+            pass
+        # If choice no, stops iteration
+        if choice == 'n':
+            break
+    return commands
+
+
+# One router request info (Paramiko)
+def create_async_playbook():
+    name = input("Please enter playbook's name: ")
+    # Invoke get_commands function
+    commands = get_async_commands()
+    # Building playbook based on the user input
+    playbook = {name:commands}
+    
+    return playbook
+
+
+# Function to store routers in JSON format
+def store_async_playbooks(filename="asynchronous_commands.json"):
+    playbooks = []
+
+    # Check if the file exists and load the existing playbooks if present
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            try:
+                playbooks = json.load(file)
+            # if not initialize empty list
+            except json.JSONDecodeError:
+                playbooks = []
+
+    # Continue adding new playbooks
+    while True:
+        # invoke create_playbook function
+        playbook = create_async_playbook()
+        # append playbook to a list
+        playbooks.append(playbook)
+
+        # "yes or no" user's choice 
+        title = "Do you want to store another Playbook (y/n)?: "
+        choice = yes_or_no(title)
+        # If yes continue adding playbooks
+        if choice == 'y':
+            pass
+        # If "n" stop iteration
+        if choice == 'n':
+            break
+            
+    # Save the updated playbooks list to the JSON file
+    with open(filename, 'w') as file:
+        json.dump(playbooks, file, indent=4)
+
+    print(f"All playbooks have been saved to {filename}")
+
+
+def load_async_playbooks(filename='asynchronous_commands.json'):
+    with open(filename, 'r') as file:
+        python_objects = json.load(file)
+
+    return python_objects
+
+# Function to iterate and print each command as options
+def print_playbook_names(playbooks):
+    for index, playbook in enumerate(playbooks, start=1):
+        for key, value in playbook.items():
+            print(f"{index}. {key}")
+
+
+# Function to search for a user input in the JSON keys
+def search_playbook(playbooks):
+    user_input = input("Enter playbook's name: ").strip()
+
+    found = False
+    for playbook in playbooks:
+        for key, value in playbook.items():
+            if user_input == key:  # Exact match with the key
+                print("Playbook found!")
+                return value  # Return the list of commands (value)
+                found = True
+
+    if not found:
+        print("Invalid playbook name!")
+        return search_playbook(playbooks)  # Recursively call to try again if not found
+
+
+def async_playbooks_menu():
+    print_separator()
+    print('Playbooks: ')
+    playbooks = load_async_playbooks()
+    print_playbook_names(playbooks)
+    commands = search_playbook(playbooks)
+
+    return commands
 
 # Pretty printing SSHCompletedProcess object
 def print_objects(objects, hosts):
