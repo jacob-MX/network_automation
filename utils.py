@@ -71,7 +71,7 @@ def yes_or_no(title):
 
 
 # Function to store routers in JSON format
-def store_routers_in_json(filename="devices.json"):
+def store_routers_in_json(filename):
     routers = []
 
     while True:
@@ -119,7 +119,7 @@ def find_json_file():
 
 
 # Read devices.json from the current directory
-def read_devices_file(filename='devices.json'):
+def read_json_file(filename):
     try:
         with open(filename, 'r') as file:
             devices = json.load(file)  # Parse the JSON file into a Python object
@@ -163,7 +163,7 @@ def create_async_playbook():
 
 
 # Function to store routers in JSON format
-def store_async_playbooks(filename="asynchronous_commands.json"):
+def store_async_playbooks(filename):
     playbooks = []
 
     # Check if the file exists and load the existing playbooks if present
@@ -199,11 +199,6 @@ def store_async_playbooks(filename="asynchronous_commands.json"):
     print(f"All playbooks have been saved to {filename}")
 
 
-def load_async_playbooks(filename='asynchronous_commands.json'):
-    with open(filename, 'r') as file:
-        python_objects = json.load(file)
-
-    return python_objects
 
 # Function to iterate and print each command as options
 def print_playbook_names(playbooks):
@@ -229,14 +224,32 @@ def search_playbook(playbooks):
         return search_playbook(playbooks)  # Recursively call to try again if not found
 
 
-def async_playbooks_menu():
-    print_separator()
+# Function to print playbooks an proceed to select one
+# it return a list of commands
+def async_playbooks_menu(file):
+
     print('Playbooks: ')
-    playbooks = load_async_playbooks()
+    # Look for the file in the current directory
+    playbooks = read_json_file(file)
+
+    # Print playbooks as a list of option
     print_playbook_names(playbooks)
+
+    # Get user choice and look for the string in the playbooks file
     commands = search_playbook(playbooks)
 
-    return commands
+    #print separator
+    print_separator()
+    # Make sure user want to execute the given name playbook
+    user_choice = yes_or_no(f'Are you sure u want to proceed with: {commands}\n (y/n): ')
+
+    if user_choice == 'y':
+        return commands
+        
+    if user_choice == 'n':
+        # return and ask again
+        async_playbooks_menu()
+
 
 # Pretty printing SSHCompletedProcess object
 def print_objects(objects, hosts):

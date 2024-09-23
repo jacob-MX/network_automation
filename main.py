@@ -23,6 +23,8 @@ print('''
                                            -Made by Angel Jacobo Madrigal''')
 
 
+
+
 def third_menu():
     # Define methods
     options = ["Show playbooks", "Add new playbook", "EXIT"]
@@ -46,7 +48,38 @@ def third_menu():
         utils.print_separator()
         print("\nInvalid option. Please select either 1, 2, or 3.")
         # Recursive function in case of multiple invalid options
-        return second_menu()
+        return third_menu()
+
+
+def playbooks_menu():
+    # Third menu to select how to proceed with playbooks
+    user_choice = third_menu()
+
+    if user_choice == '1':
+        #print separator
+        utils.print_separator()
+        print('You have selected "Print Playbooks"')
+
+        # Enter a filename and look for it as json file in the current directory
+        playbook = utils.find_json_file()
+
+        # Print menu based on the previous given filename and get commands
+        commands = utils.async_playbooks_menu(playbook)
+
+        return commands
+
+    elif user_choice == '2':
+        #print separator
+        utils.print_separator()
+        print('You have selected "Add new Playbook"')
+        # add a new playbook (default)
+        utils.store_async_playbooks("asynchronous_commands.json")
+
+        utils.print_separator()
+        # Select a playbook (default)
+        commands = utils.async_playbooks_menu("asynchronous_commands.json")
+
+    return commands
 
 
 def second_menu():
@@ -102,51 +135,46 @@ def main_menu():
             print('You have selected "JSON" format')
             # save filename given by the user and checks for its existence in the current directory
             filename = utils.find_json_file()
-           
+            # Store JSON file as Python objects
+            devices = utils.read_json_file(filename)
+
+            # Get commands from a Playbook
+            commands = playbooks_menu()
+
+            # print separator
+            utils.print_separator()
+            
+            # run multiple ssh clients and execute playbook as an asynchronous function 
+            ssh_objects = asyncio.run(ssh_manager.run_multiple_clients(devices, commands))
+            # print output per device
+            utils.print_objects(ssh_objects, devices)
+            # Handle exit (utils.py)
+            utils.handle_exit()
+                      
         if user_choice == '2':
             #print separator
             utils.print_separator()
             print('You have selected "Manual Insertion"')
 
-            utils.store_routers_in_json()
+            # Function to enter device from terminal one by one (Manually)
+            utils.store_routers_in_json("devices.json")
             # Store JSON file as Python objects
-            devices = utils.read_devices_file()
-            # Checks for existence of variable
-            
+            devices = utils.read_json_file("devices.json")
             #print separator
             utils.print_separator()
 
-            # Thir menu to select how to proceed with playbooks
-            user_choice = third_menu()
+            # Get commands from a Playbook
+            commands = playbooks_menu()
 
-            if user_choice == '1':
-                #print separator
-                utils.print_separator()
-                print('You have selected "Print Playbooks"')
-
-            if user_choice == '2':
-                #print separator
-                utils.print_separator()
-                print('You have selected "Add new Playbook"')
-                # add a new playbook (independent_commands.json)
-                utils.store_async_playbooks()
-
-                # Select a playbook
-                commands = utils.async_playbooks_menu()
-                #print separator
-                utils.print_separator()
-                # Make sure user want to execute the given name playbook
-                user_choice = utils.yes_or_no(f'Are you sure u want to porceed with:{commands}\n (y/n): ')
-
-                if user_choice == 'y':
-                    print('EXECUTION IN PROGRESS...')
-                    # Handle exit (utils.py)
-                    utils.handle_exit()
-                    
-                if user_choice == 'n':
-                    main_menu()
-
-                
+            # print separator
+            utils.print_separator()
+            
+            # run multiple ssh clients and execute playbook as an asynchronous function 
+            ssh_objects = asyncio.run(ssh_manager.run_multiple_clients(devices, commands))
+            # print output per device
+            utils.print_objects(ssh_objects, devices)
+            # Handle exit (utils.py)
+            utils.handle_exit()
                 
     # Main menu "Multithreading"    
     elif option == '2':
@@ -172,7 +200,7 @@ def main_menu():
             utils.print_separator()
             
             # Store JSON file as Python objects
-            devices = utils.read_devices_file()
+            devices = utils.read_json_file()
 
     if option == '3':
         # print separator
