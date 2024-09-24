@@ -4,3 +4,5 @@ __pycache__/
 devices.json
 json_sample.json
 asynchronous_commands.json
+independent_commands.json
+dependent_commands.json

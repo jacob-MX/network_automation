@@ -51,7 +51,7 @@ def third_menu():
         return third_menu()
 
 
-def playbooks_menu():
+def independent_playbooks_menu():
     # Third menu to select how to proceed with playbooks
     user_choice = third_menu()
 
@@ -73,14 +73,44 @@ def playbooks_menu():
         utils.print_separator()
         print('You have selected "Add new Playbook"')
         # add a new playbook (default)
-        utils.store_async_playbooks("asynchronous_commands.json")
+        utils.store_async_playbooks("independent_commands.json")
 
         utils.print_separator()
         # Select a playbook (default)
-        commands = utils.async_playbooks_menu("asynchronous_commands.json")
+        commands = utils.async_playbooks_menu("independent_commands.json")
 
     return commands
 
+
+def dependent_playbooks_menu():
+    # Third menu to select how to proceed with playbooks
+    user_choice = third_menu()
+
+    if user_choice == '1':
+        #print separator
+        utils.print_separator()
+        print('You have selected "Print Playbooks"')
+
+        # Enter a filename and look for it as json file in the current directory
+        playbook = utils.find_json_file()
+
+        # Print menu based on the previous given filename and get commands
+        commands = utils.async_playbooks_menu(playbook)
+
+        return commands
+
+    elif user_choice == '2':
+        #print separator
+        utils.print_separator()
+        print('You have selected "Add new Playbook"')
+        # add a new playbook (default)
+        utils.store_async_playbooks("dependent_commands.json")
+
+        utils.print_separator()
+        # Select a playbook (default)
+        commands = utils.async_playbooks_menu("dependent_commands.json")
+
+    return commands
 
 def second_menu():
     # Define methods
@@ -139,7 +169,7 @@ def main_menu():
             devices = utils.read_json_file(filename)
 
             # Get commands from a Playbook
-            commands = playbooks_menu()
+            commands = independent_playbooks_menu()
 
             # print separator
             utils.print_separator()
@@ -158,21 +188,25 @@ def main_menu():
 
             # Function to enter device from terminal one by one (Manually)
             utils.store_routers_in_json("devices.json")
+            
             # Store JSON file as Python objects
             devices = utils.read_json_file("devices.json")
+            
             #print separator
             utils.print_separator()
 
             # Get commands from a Playbook
-            commands = playbooks_menu()
+            commands = independent_playbooks_menu()
 
             # print separator
             utils.print_separator()
             
             # run multiple ssh clients and execute playbook as an asynchronous function 
             ssh_objects = asyncio.run(ssh_manager.run_multiple_clients(devices, commands))
+            
             # print output per device
             utils.print_objects(ssh_objects, devices)
+            
             # Handle exit (utils.py)
             utils.handle_exit()
                 
@@ -186,21 +220,62 @@ def main_menu():
         user_choice = second_menu()
         
         if user_choice == '1':
+            
             #print separator
             utils.print_separator()
+            
             print('You have selected "JSON" format')
+
+            # Look for a json file in the current directory
             filename = utils.find_json_file()
+            
+            # Store JSON file as Python objects
+            devices = utils.read_json_file(filename)
+
+            # Get commands from a Playbook
+            commands = dependent_playbooks_menu()
+
+            # print separator
+            utils.print_separator()
+
+            # Execute commands using multithreading (ssh_manager)
+            outputs = ssh_manager.multithreading_execution(devices, commands)
+            # Print outputs
+            for output in outputs:
+                print(output)
+
+            # Handle exit (utils.py)
+            utils.handle_exit()
 
         if user_choice == '2':
             #print separator
             utils.print_separator()
             print('You have selected "Manual Insertion"')
-            utils.store_routers_in_json()
-            #print separator
-            utils.print_separator()
+            
+            # Function to enter device from terminal one by one (Manually)
+            utils.store_routers_in_json("devices.json")
             
             # Store JSON file as Python objects
-            devices = utils.read_json_file()
+            devices = utils.read_json_file("devices.json")
+            
+            #print separator
+            utils.print_separator()
+
+            # Get commands from a Playbook
+            commands = dependent_playbooks_menu()
+
+            # print separator
+            utils.print_separator()
+
+            # Execute commands using multithreading (ssh_manager)
+            outputs = ssh_manager.multithreading_execution(devices, commands)
+            # Print outputs
+            for output in outputs:
+                print(output)
+                
+            # Handle exit (utils.py)
+            utils.handle_exit()
+            
 
     if option == '3':
         # print separator
