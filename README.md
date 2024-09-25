@@ -22,7 +22,7 @@ This repository focuses on **network automation** using Python, implementing fea
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/network-automation.git
+   git clone https://github.com/jacob-MX/network_automation.git
    cd network-automation
    ```
 
@@ -70,8 +70,3 @@ Playbooks allow you to group dependent commands to be executed across multiple d
 
 Contributions are welcome! Please submit a pull request or open an issue if you'd like to collaborate.
 
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
