@@ -15,12 +15,8 @@ print('''
 ▐▛▚▖▐▐▌    █ ▐▌ ▐▐▌ ▐▌█ ▐▌▗▞▘    ▐▌ ▐▐▌ ▐▌ █▐▌ ▐▐▛▚▞▜▐▌ ▐▌█   █ ▐▌ ▐▐▛▚▖▐▌
 ▐▌ ▝▜▐▛▀▀▘ █ ▐▌ ▐▐▌ ▐▌█ ▐▛▚▖     ▐▛▀▜▐▌ ▐▌ █▐▌ ▐▐▌  ▐▐▛▀▜▌█   █ ▐▌ ▐▐▌ ▝▜▌
 ▐▌  ▐▐▙▄▄▖ █ ▐▙█▟▝▚▄▞▘█ ▐▌ ▐▌    ▐▌ ▐▝▚▄▞▘ █▝▚▄▞▐▌  ▐▐▌ ▐▌█ ▗▄█▄▝▚▄▞▐▌  ▐▌
-                                                                          
-                                                                          
-                                                                          
-           
-                                                          
-                                           -Made by Angel Jacobo Madrigal''')
+
+                                           - Made by Angel Jacobo Madrigal''')
 
 def first_menu():
     # Define options
@@ -64,8 +60,6 @@ def dependent_or_independent():
     return option
 
 
-
-    
 # Main menu to select between methods
 def main_menu():
     #print separator
@@ -86,7 +80,6 @@ def main_menu():
             #print separator
             utils.print_separator()
             print('You have selected "Dependent Commands" method')
-            # Invoke second menu and store the user's choice
             # Handle exit
             utils.handle_exit()
         
@@ -119,35 +112,40 @@ def main_menu():
             #print separator
             utils.print_separator()
             print('You have selected "Dependent Commands" method')
-            # Invoke second menu and store the user's choice
-            # Handle exit
-            utils.handle_exit()
+            # Invoke add new playbook 
+            utils.add_new_playbook('dependent')
+            # print separator
+            utils.print_separator()
+            main_menu
         
         # Option 2 (Independent)       
         elif user_choice == '2':
             #print separator
             utils.print_separator()
             print('You have selected "Independent Commands" method')
-            # Invoke second menu and store the user's choice
-            # Handle exit
-            utils.handle_exit()
+            # Invoke add new playbook menu 
+            utils.add_new_playbook('independent')
+            # print separator
+            utils.print_separator()
+            main_menu
 
         elif user_choice == '3':
             #print separator
             utils.print_separator()
             print('You have selected "Back" method')
-            # Invoke second menu and store the user's choice
+            # back to main
             main_menu()
-
 
     # Option 3 (Add a device)
     if user_choice == '3':
         # print separator
         utils.print_separator()
         print('You have selected "Add a device" method')
-        # Invoke menu and store the user's choice
-        # Handle exit
-        utils.handle_exit()
+        # Invoke add a new device menu 
+        utils.add_new_device()
+        # print separator
+        utils.print_separator()
+        main_menu
 
 if __name__ == '__main__':
     main_menu()

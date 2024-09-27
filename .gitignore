@@ -1,8 +1,5 @@
 venv/
 __pycache__/
 .ipynb_checkpoints/
-devices.json
-json_sample.json
-asynchronous_commands.json
-independent_commands.json
-dependent_commands.json
+devices/
+playbooks/

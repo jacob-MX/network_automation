@@ -21,14 +21,21 @@ def clear_terminal():
     os.system('clear')       
 
 
-#Print a separator based on the terminal width.
-def print_separator(char='-'):
-    
+def print_separator():
     # Get the terminal size
     terminal_size = os.get_terminal_size()
+
+    # Define the pattern
+    pattern = '>><<>><<'
     
-    # Create a separator with the given character and terminal width
-    separator = char * terminal_size.columns
+    # Calculate how many times the pattern can fit into the terminal width
+    repeat_count = terminal_size.columns // len(pattern)
+    
+    # Create the separator by repeating the pattern
+    separator = pattern * repeat_count
+    
+    # If the pattern does not perfectly fit, slice the string to match the exact terminal width
+    separator = separator[:terminal_size.columns]
     
     # Print the separator
     print(separator)
@@ -46,17 +53,6 @@ def get_user_input(prompt):
         return input(prompt)
     except KeyboardInterrupt:
         handle_exit()
-        
-
-# One router request info (Paramiko)
-def get_router_info():
-    router = {
-        'hostname': input("Enter the router's IP address: "),
-        'port': input("Enter the port number (default is 22): ") or '22',  # Default to port 22 if no input
-        'username': input("Enter the username: "),
-        'password': input("Enter the password: ")
-    }
-    return router
 
 
 # Two options Menu
@@ -68,68 +64,88 @@ def yes_or_no(title):
     else:
         print('Please select a correct answer: "y" or "n"')
         return yes_or_no(title)
+        
 
+# One router request info (Paramiko)
+def get_router_info():
+    router = {
+        'hostname': input("Enter the router's IP address: "),
+        'port': input("Enter the port number (default is 22): ") or '22',  # Default to port 22 if no input
+        'username': input("Enter the username: "),
+        'password': input("Enter the password: ")
+    }
+    return router
+    
 
-# Function to store routers in JSON format
-def store_routers_in_json(filename):
-    routers = []
+# Function to store devices in JSON format
+def append_device(filename):
+    devices = []
 
+    # Check if the file exists and load the existing playbooks if present
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            try:
+                devices = json.load(file)
+            # if not initialize empty list
+            except json.JSONDecodeError:
+                devices = []
+
+    # Continue adding new devices
     while True:
-        # Get router info from user
-        router = get_router_info()
-        routers.append(router)
+        # invoke create_playbook function
+        device = get_router_info()
+        # append playbook to a list
+        devices.append(device)
 
         # "yes or no" user's choice 
-        title = "Do you want to store another device? (y/n): "
-        user_choice = yes_or_no(title)
-        if user_choice == 'y':
+        title = "\nDo you want to store another device (y/n)?: "
+        choice = yes_or_no(title)
+        
+        # If yes continue adding playbooks
+        if choice == 'y':
             pass
-        if user_choice == 'n':
+        # If "n" stop iteration
+        if choice == 'n':
             break
             
-    # Save the routers list to a JSON file
+    # Save the updated playbooks list to the JSON file
     with open(filename, 'w') as file:
-        json.dump(routers, file, indent=4)
+        json.dump(devices, file, indent=4)
 
-    print(f"All router information has been saved to {filename}")
-
-
-# Find JSON file in current direcotry
-def find_json_file():
-    while True:
-        try:
-            # Get the filename from the user
-            filename = get_user_input('Please enter the file name (with .json extension): ')
-
-            # Check in the current directory
-            current_dir = os.getcwd()
-            filepath = os.path.join(current_dir, filename)
-
-            if os.path.exists(filepath) and filepath.endswith('.json'):
-                print(f"File found in the current directory: {filepath}")
-                print_separator()
-                return filename
-            else:
-                print("File not found in the current directory or it's not a JSON file.")
-                print_separator()
-        
-        except KeyboardInterrupt:
-            handle_exit()
+    print(f"All devices have been saved to {filename}")
 
 
-
-# Read devices.json from the current directory
-def read_json_file(filename):
+def add_new_device():
+    """Fetch and display available OS devices."""
+    
+    path = f"devices/"
+    
+    # List all JSON files in the selected directory
+    json_files = [f for f in os.listdir(path) if f.endswith('.json')]
+    
+    # Print the available OS options
+    print("\nWhich OS is your device?")
+    for i, file in enumerate(json_files, start=1):
+        # Display the file names without the .json extension
+        print(f"{i}. {file.replace('.json', '')}")
+    
+    # Get the user's selection
     try:
-        with open(filename, 'r') as file:
-            devices = json.load(file)  # Parse the JSON file into a Python object
-        return devices
-    except FileNotFoundError:
-        print("Error: The file 'devices.json' was not found.")
-    except json.JSONDecodeError:
-        print("Error: The file 'devices.json' contains invalid JSON.")
-        
-    return None
+        user_choice = int(input("\nSelect an option by number: ")) - 1
+        if user_choice < 0 or user_choice >= len(json_files):
+            raise ValueError
+    except ValueError:
+        print("Invalid option. Please select a valid number.")
+        return get_operating_system_files(command_type)  # Retry in case of invalid input
+
+    # Read the selected JSON file
+    selected_file = os.path.join(path, json_files[user_choice])
+    
+    append_device(selected_file)
+
+
+
+
 
 
 # get commands by the user and returns a list
@@ -183,7 +199,7 @@ def store_async_playbooks(filename):
         playbooks.append(playbook)
 
         # "yes or no" user's choice 
-        title = "Do you want to store another Playbook (y/n)?: "
+        title = "\nDo you want to store another Playbook (y/n)?: "
         choice = yes_or_no(title)
         # If yes continue adding playbooks
         if choice == 'y':
@@ -200,55 +216,36 @@ def store_async_playbooks(filename):
 
 
 
-# Function to iterate and print each command as options
-def print_playbook_names(playbooks):
-    for index, playbook in enumerate(playbooks, start=1):
-        for key, value in playbook.items():
-            print(f"{index}. {key}")
+
+def add_new_playbook(command_type):
+    """Fetch and display available OS files for the selected command type."""
+    # Set the path based on the command type (dependent or independent)
+    path = f"playbooks/{command_type}_commands"
+    
+    # List all JSON files in the selected directory
+    json_files = [f for f in os.listdir(path) if f.endswith('.json')]
+    
+    # Print the available OS options
+    print("\nWhich operating system would you like to add the playbook to?")
+    for i, file in enumerate(json_files, start=1):
+        # Display the file names without the .json extension
+        print(f"{i}. {file.replace('.json', '')}")
+    
+    # Get the user's selection
+    try:
+        user_choice = int(input("\nSelect an option by number: ")) - 1
+        if user_choice < 0 or user_choice >= len(json_files):
+            raise ValueError
+    except ValueError:
+        print("Invalid option. Please select a valid number.")
+        return get_operating_system_files(command_type)  # Retry in case of invalid input
+
+    # Read the selected JSON file
+    selected_file = os.path.join(path, json_files[user_choice])
+    
+    store_async_playbooks(selected_file)
 
 
-# Function to search for a user input in the JSON keys
-def search_playbook(playbooks):
-    user_input = input("Enter playbook's name: ").strip()
-
-    found = False
-    for playbook in playbooks:
-        for key, value in playbook.items():
-            if user_input == key:  # Exact match with the key
-                print("Playbook found!")
-                return value  # Return the list of commands (value)
-                found = True
-
-    if not found:
-        print("Invalid playbook name!")
-        return search_playbook(playbooks)  # Recursively call to try again if not found
-
-
-# Function to print playbooks an proceed to select one
-# it return a list of commands
-def async_playbooks_menu(file):
-
-    print('Playbooks: ')
-    # Look for the file in the current directory
-    playbooks = read_json_file(file)
-
-    # Print playbooks as a list of option
-    print_playbook_names(playbooks)
-
-    # Get user choice and look for the string in the playbooks file
-    commands = search_playbook(playbooks)
-
-    #print separator
-    print_separator()
-    # Make sure user want to execute the given name playbook
-    user_choice = yes_or_no(f'Are you sure u want to proceed with: {commands}\n (y/n): ')
-
-    if user_choice == 'y':
-        return commands
-        
-    if user_choice == 'n':
-        # return and ask again
-        async_playbooks_menu()
 
 
 # Pretty printing SSHCompletedProcess object
@@ -265,6 +262,7 @@ def print_objects(objects, hosts):
             print(f"Standard Error (if any): {command.stderr}")
             print('#' * 50)
         i += 1
+
 
 
 
