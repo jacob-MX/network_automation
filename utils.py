@@ -216,8 +216,7 @@ def store_async_playbooks(filename):
 
 
 
-
-def add_new_playbook(command_type):
+def playbooks_os_menu(command_type):
     """Fetch and display available OS files for the selected command type."""
     # Set the path based on the command type (dependent or independent)
     path = f"playbooks/{command_type}_commands"
@@ -230,6 +229,12 @@ def add_new_playbook(command_type):
     for i, file in enumerate(json_files, start=1):
         # Display the file names without the .json extension
         print(f"{i}. {file.replace('.json', '')}")
+
+
+def add_new_playbook(command_type):
+
+    # print os options for playbooks
+    playbooks_os_menu(command_type)
     
     # Get the user's selection
     try:
@@ -246,6 +251,67 @@ def add_new_playbook(command_type):
     store_async_playbooks(selected_file)
 
 
+def devices_os_menu():
+    """Fetch and display available OS devices."""
+    path = "devices"
+    
+    # List all JSON files in the selected directory
+    json_files = [f for f in os.listdir(path) if f.endswith('.json')]
+    
+    # Print the available OS options
+    print("\nWhich operating system would you like to execute?")
+    for i, file in enumerate(json_files, start=1):
+        # Display the file names without the .json extension
+        print(f"{i}. {file.replace('.json', '')}")
+    
+    return json_files
+
+def get_json_devices_by_os():
+    """Get the devices from the selected OS JSON file."""
+    json_files = devices_os_menu()
+    
+    # Get user input to select the OS
+    choice = int(input("\nSelect the number corresponding to the OS: "))
+    
+    if 1 <= choice <= len(json_files):
+        selected_file = json_files[choice - 1]
+        
+        # Load the selected JSON file
+        with open(os.path.join("devices", selected_file), "r") as f:
+            devices = json.load(f)
+        
+        # Return the list of devices
+        return devices, selected_file
+    else:
+        print("Invalid choice. Please try again.")
+        return get_json_devices_by_os()
+
+
+def playbooks_menu(method, file):
+    
+    file_path = f"playbooks/{method}_commands/{file}"
+    
+    # Load the JSON file containing commands
+    with open(file_path, 'r') as file:
+        commands = json.load(file)
+        
+    # Display a menu of command options
+    print("Please select a command to run:")
+    for index, command in enumerate(commands, 1):
+        print(f"{index}. {list(command.keys())[0]}")
+        
+    return commands
+
+
+def get_playbook_by_name(commands):
+    
+    # Ask the user to select a command
+    choice = int(input("\nEnter the number of the Playbook to run: ")) - 1
+    if choice < 0 or choice >= len(commands):
+        print("Invalid choice. Please try again.")
+        return get_playbook_by_name(commands)
+        
+    return list(commands[choice].values())[0]  # Return the command list
 
 
 # Pretty printing SSHCompletedProcess object

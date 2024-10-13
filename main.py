@@ -60,6 +60,8 @@ def dependent_or_independent():
     return option
 
 
+
+
 # Main menu to select between methods
 def main_menu():
     #print separator
@@ -77,18 +79,49 @@ def main_menu():
 
         # Option 1 (Dependent)
         if user_choice == '1':
+            
+            command_type = "dependent"
+            
             #print separator
             utils.print_separator()
+            
             print('You have selected "Dependent Commands" method')
+            
+            # Select devices
+            devices, file = utils.get_json_devices_by_os()
+            
+            # print playbooks menu
+            playbook = utils.playbooks_menu(command_type, file)
+            
+            # Select playbook
+            commands = utils.get_playbook_by_name(playbook)
+                
+            # print commands
+            print(commands)
             # Handle exit
             utils.handle_exit()
         
         # Option 2 (Independent)       
         elif user_choice == '2':
+
+            command_type = "independent"
+            
             #print separator
             utils.print_separator()
+            
             print('You have selected "Independent Commands" method')
-            # Invoke second menu and store the user's choice
+            
+            # Select devices
+            devices, file = utils.get_json_devices_by_os()
+            
+            # print playbooks menu
+            playbook = utils.playbooks_menu(command_type, file)
+            
+            # Select playbook
+            commands = utils.get_playbook_by_name(playbook)
+                
+            # print commands
+            print(commands)
             # Handle exit
             utils.handle_exit()
 
