@@ -102,11 +102,34 @@ def main_menu():
         commands = utils.get_playbook_by_name(playbook)
             
         # print commands
-        print(commands)
+        utils.yes_or_no('Are you sure you want to proceed?(y/n)')
+
+        if command_type == 'dependent':
+            
+            # Execute commands using multithreading (ssh_manager)
+            outputs = ssh_manager.multithreading_execution(devices, commands)
+            
+            # Print outputs
+            for output in outputs:
+                print(output)
+
+            # Handle exit (utils.py)
+            utils.handle_exit()
+            
+        elif command_type == 'independent':
+            
+            # run multiple ssh clients and execute playbook as an asynchronous function 
+            ssh_objects = asyncio.run(ssh_manager.run_multiple_clients(devices, commands))
+            
+            # print output per device
+            utils.print_objects(ssh_objects, devices)
+            
+            # Handle exit (utils.py)
+            utils.handle_exit()           
+        
         # Handle exit
         utils.handle_exit()
         
-            
     # Option 2 (Add a playbook)   
     elif user_choice == '2':
         

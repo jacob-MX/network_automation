@@ -144,10 +144,6 @@ def add_new_device():
     append_device(selected_file)
 
 
-
-
-
-
 # get commands by the user and returns a list
 def get_async_commands():
     commands = list()
