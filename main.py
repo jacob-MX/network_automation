@@ -50,16 +50,23 @@ def dependent_or_independent():
     # Get user's choice for method
     option = utils.get_user_input('Please select an option: ')
 
-    if option not in ['1', '2', '3']:
+    if option == '1':
+        command_type = 'dependent'
+
+    elif option == '2':
+        command_type = 'independent'
+
+    elif option =='3':
+        main_menu()
+
+    else:
         # print separator
         utils.print_separator()
         print("\nInvalid option. Please select either 1, 2, or 3.")
         # Recursive function in case of multiple invalid options
         return dependent_or_independent()
         
-    return option
-
-
+    return option, command_type
 
 
 # Main menu to select between methods
@@ -75,109 +82,68 @@ def main_menu():
         utils.print_separator()
         print('You have selected "Execute commands" method')
         # Invoke dependent or independent menu and store the user's choice
-        user_choice = dependent_or_independent()
-
-        # Option 1 (Dependent)
-        if user_choice == '1':
-            
-            command_type = "dependent"
-            
-            #print separator
-            utils.print_separator()
-            
-            print('You have selected "Dependent Commands" method')
-            
-            # Select devices
-            devices, file = utils.get_json_devices_by_os()
-            
-            # print playbooks menu
-            playbook = utils.playbooks_menu(command_type, file)
-            
-            # Select playbook
-            commands = utils.get_playbook_by_name(playbook)
-                
-            # print commands
-            print(commands)
-            # Handle exit
-            utils.handle_exit()
+        user_choice, command_type = dependent_or_independent()
+ 
+        #print separator
+        utils.print_separator()
         
-        # Option 2 (Independent)       
-        elif user_choice == '2':
+        print(f'You have selected "{command_type}" commands execution.')
+        
+        # Select devices
+        devices, file = utils.get_json_devices_by_os()
 
-            command_type = "independent"
+        #print separator
+        utils.print_separator()
+        
+        # print playbooks menu
+        playbook = utils.playbooks_menu(command_type, file)
+        
+        # Select playbook
+        commands = utils.get_playbook_by_name(playbook)
             
-            #print separator
-            utils.print_separator()
-            
-            print('You have selected "Independent Commands" method')
-            
-            # Select devices
-            devices, file = utils.get_json_devices_by_os()
-            
-            # print playbooks menu
-            playbook = utils.playbooks_menu(command_type, file)
-            
-            # Select playbook
-            commands = utils.get_playbook_by_name(playbook)
-                
-            # print commands
-            print(commands)
-            # Handle exit
-            utils.handle_exit()
-
-        elif user_choice == '3':
-            #print separator
-            utils.print_separator()
-            print('You have selected "Back" method')
-            # Invoke second menu and store the user's choice
-            main_menu()
+        # print commands
+        print(commands)
+        # Handle exit
+        utils.handle_exit()
+        
             
     # Option 2 (Add a playbook)   
     elif user_choice == '2':
+        
         # print separator
         utils.print_separator()
-        print('You have selected "Add a playbook" method')
-        # Invoke dependent or independent menu and store the user's choice
-        user_choice = dependent_or_independent()
-
-        # Option 1 (Dependent)
-        if user_choice == '1':
-            #print separator
-            utils.print_separator()
-            print('You have selected "Dependent Commands" method')
-            # Invoke add new playbook 
-            utils.add_new_playbook('dependent')
-            # print separator
-            utils.print_separator()
-            main_menu
         
-        # Option 2 (Independent)       
-        elif user_choice == '2':
-            #print separator
-            utils.print_separator()
-            print('You have selected "Independent Commands" method')
-            # Invoke add new playbook menu 
-            utils.add_new_playbook('independent')
-            # print separator
-            utils.print_separator()
-            main_menu
+        print('You have selected "Add a playbook" method')
+        
+        # Invoke dependent or independent menu and store the user's choice
+        user_choice, command_type = dependent_or_independent()
 
-        elif user_choice == '3':
-            #print separator
-            utils.print_separator()
-            print('You have selected "Back" method')
-            # back to main
-            main_menu()
+        #print separator
+        utils.print_separator()
+        
+        print(f'You have selected "{command_type}" method')
+        
+        # Invoke add new playbook 
+        utils.add_new_playbook(command_type)
+        
+        # print separator
+        utils.print_separator()
+        main_menu
 
     # Option 3 (Add a device)
     if user_choice == '3':
+        
         # print separator
         utils.print_separator()
+        
         print('You have selected "Add a device" method')
+        
         # Invoke add a new device menu 
         utils.add_new_device()
+        
         # print separator
         utils.print_separator()
+        
         main_menu
 
 if __name__ == '__main__':

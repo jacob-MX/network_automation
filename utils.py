@@ -229,12 +229,14 @@ def playbooks_os_menu(command_type):
     for i, file in enumerate(json_files, start=1):
         # Display the file names without the .json extension
         print(f"{i}. {file.replace('.json', '')}")
+        
+    return json_files, path
 
 
 def add_new_playbook(command_type):
 
     # print os options for playbooks
-    playbooks_os_menu(command_type)
+    json_files, path = playbooks_os_menu(command_type)
     
     # Get the user's selection
     try:
